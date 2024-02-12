@@ -1,4 +1,6 @@
 #include <Novice.h>
+#include "InputHandler.h"
+#include "Player.h"
 
 const char kWindowTitle[] = "LE2C_18_ツチヤ_トモノリ";
 
@@ -12,6 +14,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
+	InputHandler* inputHandler = new InputHandler();
+	inputHandler->AssignMoveLeftCommand2PressKeyA();
+	inputHandler->AssignMoveRightCommand2PressKeyD();
+
+	ICommand* command_ = nullptr;
+	Player* player = new Player();
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -25,6 +33,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		command_ = inputHandler->HandleInput();
+
+		if (command_)
+		{
+			command_->Exec(*player);
+		}
+
+		player->Update();
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -32,6 +49,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		player->Draw();
 
 		///
 		/// ↑描画処理ここまで
@@ -45,6 +64,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 	}
+
+	delete command_;
+	delete player;
 
 	// ライブラリの終了
 	Novice::Finalize();
